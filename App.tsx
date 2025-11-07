@@ -21,13 +21,19 @@ const Section: React.FC<SectionProps> = ({ id, children, className = '' }) => (
   </section>
 );
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+// Fix: Update ButtonProps to be a discriminated union to correctly type props for `<a>` and `<button>` elements.
+type ButtonProps = {
   variant?: 'primary' | 'secondary' | 'ghost';
   children: React.ReactNode;
-  href?: string;
-}
+} & (
+  | (React.ButtonHTMLAttributes<HTMLButtonElement> & { href?: never })
+  | (React.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string })
+);
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ variant = 'primary', children, href, ...props }, ref) => {
+const Button = React.forwardRef<
+  HTMLButtonElement | HTMLAnchorElement,
+  ButtonProps
+>(({ variant = 'primary', children, ...props }, ref) => {
   const baseClasses = "inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900";
   const variantClasses = {
     primary: 'bg-primary-DEFAULT text-white hover:bg-primary-dark focus:ring-primary-light',
@@ -35,16 +41,32 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ variant = 'pr
     ghost: 'bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
   };
 
-  const commonProps = {
-    ...props,
-    className: `${baseClasses} ${variantClasses[variant]} ${props.className || ''}`
-  };
-
-  if (href) {
-    return <a href={href} {...commonProps} role="button">{children}</a>;
+  const className = `${baseClasses} ${variantClasses[variant]} ${props.className || ''}`;
+  
+  if (props.href) {
+    const { className: _, ...rest } = props;
+    return (
+      <a
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        {...rest}
+        className={className}
+        role="button"
+      >
+        {children}
+      </a>
+    );
   }
 
-  return <button ref={ref} {...commonProps}>{children}</button>;
+  const { className: _, ...rest } = props;
+  return (
+    <button
+      ref={ref as React.Ref<HTMLButtonElement>}
+      {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+      className={className}
+    >
+      {children}
+    </button>
+  );
 });
 Button.displayName = 'Button';
 
@@ -88,7 +110,7 @@ const Header: React.FC<{ lang: Language; setLang: (lang: Language) => void; isDa
 };
 
 const Hero: React.FC<{ lang: Language }> = ({ lang }) => (
-  <Section id="hero" className="pt-24 md:pt-32 text-center bg-slate-50 dark:bg-slate-900">
+  <Section id="hero" className="pt-24 md:pt-32 text-center hero-bg">
     <h1 className="text-4xl md:text-6xl font-extrabold text-slate-800 dark:text-white leading-tight tracking-tighter">
       {content[lang].hero.title.line1}
       <br />
@@ -109,37 +131,62 @@ const Hero: React.FC<{ lang: Language }> = ({ lang }) => (
 );
 
 const Features: React.FC<{ lang: Language }> = ({ lang }) => (
-  <Section id="features">
-    <div className="text-center">
-      <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white">{content[lang].features.title}</h2>
-      <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-400">{content[lang].features.subtitle}</p>
-    </div>
-    <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {content[lang].features.items.map((feature, index) => (
-        <div key={index} className="bg-white dark:bg-slate-800 p-8 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 border border-slate-100 dark:border-slate-700">
-          <div className="flex items-center justify-center h-16 w-16 rounded-full bg-primary-light/10 dark:bg-primary-dark/20 mb-6">
-            <span className="text-3xl">{feature.icon}</span>
-          </div>
-          <h3 className="text-xl font-bold text-slate-800 dark:text-white">{feature.title}</h3>
-          <p className="mt-2 text-slate-600 dark:text-slate-400">{feature.description}</p>
-        </div>
-      ))}
-    </div>
-  </Section>
+    <Section id="features">
+      <div className="text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white">{content[lang].features.title}</h2>
+        <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-400">{content[lang].features.subtitle}</p>
+      </div>
+      <div className="mt-16 grid grid-cols-1 md:grid-cols-6 gap-8">
+        {content[lang].features.items.map((feature, index) => {
+          const gridSpans = [
+            'md:col-span-4', // 1분 내 모의고사 생성
+            'md:col-span-2', // 10배 빠른 자막 등록
+            'md:col-span-2', // 일관된 UI/UX
+            'md:col-span-4', // 통합 콘텐츠 관리
+            'md:col-span-3', // 강력한 필터 & 검색
+            'md:col-span-3', // 편리한 ID 복사
+          ];
+          return (
+            <div 
+              key={index} 
+              className={`bg-white dark:bg-slate-800 p-8 rounded-xl shadow-soft-lg transition-all duration-300 hover:-translate-y-1 border border-slate-100 dark:border-slate-700/50 ${gridSpans[index]}`}
+            >
+              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-primary-light/10 dark:bg-primary-dark/20 mb-6">
+                <span className="text-3xl">{feature.icon}</span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white">{feature.title}</h3>
+              <p className="mt-2 text-slate-600 dark:text-slate-400">{feature.description}</p>
+            </div>
+          );
+        })}
+      </div>
+    </Section>
 );
+  
 
 const Screenshots: React.FC<{ lang: Language }> = ({ lang }) => (
-  <Section id="screenshots" className="bg-slate-50 dark:bg-slate-900/70">
-    <div className="text-center">
-      <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white">{content[lang].screenshots.title}</h2>
-      <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-400">{content[lang].screenshots.subtitle}</p>
-    </div>
-    <div className="mt-12 w-full aspect-video bg-slate-200 dark:bg-slate-800 rounded-lg shadow-2xl flex items-center justify-center">
-      <p className="text-slate-500 font-medium">
-        {content[lang].screenshots.placeholder}
-      </p>
-    </div>
-  </Section>
+    <Section id="screenshots" className="bg-slate-50 dark:bg-slate-900/70">
+      <div className="text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white">{content[lang].screenshots.title}</h2>
+        <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-400">{content[lang].screenshots.subtitle}</p>
+      </div>
+      <div className="mt-12 max-w-6xl mx-auto">
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-soft-lg border border-slate-200 dark:border-slate-700 p-2">
+          <div className="h-8 bg-slate-100 dark:bg-slate-800 rounded-t-lg flex items-center px-4">
+            <div className="flex gap-2">
+              <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+              <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+              <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+            </div>
+          </div>
+          <div className="w-full aspect-video bg-slate-50 dark:bg-slate-800 rounded-b-lg flex items-center justify-center">
+            <p className="text-slate-500 font-medium">
+              {content[lang].screenshots.placeholder}
+            </p>
+          </div>
+        </div>
+      </div>
+    </Section>
 );
 
 const Download: React.FC<{ lang: Language }> = ({ lang }) => (
@@ -153,7 +200,7 @@ const Download: React.FC<{ lang: Language }> = ({ lang }) => (
         </Button>
         <p className="mt-2 text-sm text-slate-500">{content[lang].download.releaseNotes}</p>
       </div>
-      <div className="bg-slate-100 dark:bg-slate-800 p-8 rounded-lg border border-slate-200 dark:border-slate-700">
+      <div className="bg-slate-100 dark:bg-slate-800 p-8 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-soft-lg">
         <h3 className="font-bold text-slate-700 dark:text-slate-200">{content[lang].download.instructions.title}</h3>
         <ul className="mt-4 space-y-3 text-slate-600 dark:text-slate-400">
           {content[lang].download.instructions.steps.map((step, i) => (
@@ -210,17 +257,17 @@ const Technical: React.FC<{ lang: Language }> = ({ lang }) => (
       <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-400">{content[lang].technical.subtitle}</p>
     </div>
     <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-        <div className="bg-white dark:bg-slate-800 p-8 rounded-lg shadow-lg border border-slate-100 dark:border-slate-700">
+        <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-soft-lg border border-slate-100 dark:border-slate-700/50 transition-all duration-300 hover:-translate-y-1">
             <LockClosedIcon className="w-12 h-12 mx-auto text-primary-DEFAULT" />
             <h3 className="mt-4 text-xl font-bold text-slate-800 dark:text-white">{content[lang].technical.security.title}</h3>
             <p className="mt-2 text-slate-600 dark:text-slate-400">{content[lang].technical.security.description}</p>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-8 rounded-lg shadow-lg border border-slate-100 dark:border-slate-700">
+        <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-soft-lg border border-slate-100 dark:border-slate-700/50 transition-all duration-300 hover:-translate-y-1">
             <AccessibilityIcon className="w-12 h-12 mx-auto text-primary-DEFAULT" />
             <h3 className="mt-4 text-xl font-bold text-slate-800 dark:text-white">{content[lang].technical.accessibility.title}</h3>
             <p className="mt-2 text-slate-600 dark:text-slate-400">{content[lang].technical.accessibility.description}</p>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-8 rounded-lg shadow-lg border border-slate-100 dark:border-slate-700">
+        <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-soft-lg border border-slate-100 dark:border-slate-700/50 transition-all duration-300 hover:-translate-y-1">
             <LayersIcon className="w-12 h-12 mx-auto text-primary-DEFAULT" />
             <h3 className="mt-4 text-xl font-bold text-slate-800 dark:text-white">{content[lang].technical.architecture.title}</h3>
             <p className="mt-2 text-slate-600 dark:text-slate-400">{content[lang].technical.architecture.description}</p>
@@ -320,27 +367,35 @@ const CopyButton: React.FC<{ text: string }> = ({ text }) => {
 
 
 export default function App() {
-  const [lang, setLang] = useState<Language>('ko');
+  // Fix: Use enum member for initialization for type safety.
+  const [lang, setLang] = useState<Language>(Language.KO);
   const [isDarkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setDarkMode(true);
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
+        setDarkMode(true);
     }
+
     document.documentElement.lang = lang;
   }, [lang]);
 
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);
 
+  const toggleDarkMode = () => setDarkMode(prev => !prev);
+
   return (
     <>
-      <Header lang={lang} setLang={setLang} isDarkMode={isDarkMode} setDarkMode={setDarkMode} />
+      <Header lang={lang} setLang={setLang} isDarkMode={isDarkMode} setDarkMode={toggleDarkMode} />
       <main>
         <Hero lang={lang} />
         <Features lang={lang} />
@@ -354,4 +409,3 @@ export default function App() {
     </>
   );
 }
-   
