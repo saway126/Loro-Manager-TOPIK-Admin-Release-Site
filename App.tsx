@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { content } from './constants';
 import { Language } from './types';
-import { LogoIcon, ChevronDownIcon, SunIcon, MoonIcon, ExternalLinkIcon, CheckCircleIcon, LockClosedIcon, AccessibilityIcon, LayersIcon, ClipboardIcon, LinkIcon } from './components/Icons';
+import { LogoIcon, ChevronDownIcon, SunIcon, MoonIcon, ExternalLinkIcon, CheckCircleIcon, LockClosedIcon, AccessibilityIcon, LayersIcon, ClipboardIcon, LinkIcon, ArrowDownTrayIcon } from './components/Icons';
 
 // Helper Components
 // ===============================================
@@ -36,7 +36,7 @@ const Button = React.forwardRef<
 >(({ variant = 'primary', children, ...props }, ref) => {
   const baseClasses = "inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900";
   const variantClasses = {
-    primary: 'bg-primary-DEFAULT text-white hover:bg-primary-dark focus:ring-primary-light',
+    primary: 'bg-primary-DEFAULT text-white hover:bg-primary-dark focus:ring-primary-light disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed',
     secondary: 'bg-emerald-500 text-white hover:bg-emerald-600 focus:ring-emerald-400',
     ghost: 'bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
   };
@@ -217,39 +217,97 @@ const Screenshots: React.FC<{ lang: Language }> = ({ lang }) => (
     </Section>
 );
 
-const Download: React.FC<{ lang: Language }> = ({ lang }) => (
-  <Section id="download">
-    <div className="grid md:grid-cols-2 gap-12 items-center">
-      <div>
-        <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white">{content[lang].download.title}</h2>
-        <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{content[lang].download.subtitle}</p>
-        <Button href="#" className="mt-8 text-lg">
-          {content[lang].download.cta} v1.0.0
-        </Button>
-        <p className="mt-2 text-sm text-slate-500">{content[lang].download.releaseNotes}</p>
-      </div>
-      <div className="bg-slate-100 dark:bg-slate-800 p-8 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-soft-lg">
-        <h3 className="font-bold text-slate-700 dark:text-slate-200">{content[lang].download.instructions.title}</h3>
-        <ul className="mt-4 space-y-3 text-slate-600 dark:text-slate-400">
-          {content[lang].download.instructions.steps.map((step, i) => (
-             <li key={i} className="flex items-start gap-3">
-              <CheckCircleIcon className="w-5 h-5 text-accent-DEFAULT mt-1 flex-shrink-0" />
-              <span>{step}</span>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-6 border-t border-slate-200 dark:border-slate-700 pt-6">
-          <h3 className="font-bold text-slate-700 dark:text-slate-200">{content[lang].download.requirements.title}</h3>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            {content[lang].download.requirements.browser}
-            <br/>
-            {content[lang].download.requirements.resolution}
-          </p>
-        </div>
-      </div>
-    </div>
-  </Section>
-);
+const Download: React.FC<{ lang: Language }> = ({ lang }) => {
+    const [downloadState, setDownloadState] = useState<'idle' | 'downloading' | 'completed'>('idle');
+    const [progress, setProgress] = useState(0);
+
+    const startDownload = useCallback(() => {
+        if (downloadState !== 'idle') return;
+
+        setDownloadState('downloading');
+        setProgress(0);
+
+        const interval = setInterval(() => {
+            setProgress(prev => {
+                if (prev >= 100) {
+                    clearInterval(interval);
+                    setDownloadState('completed');
+                    setTimeout(() => {
+                        setDownloadState('idle');
+                        setProgress(0);
+                    }, 2000);
+                    return 100;
+                }
+                return prev + 1;
+            });
+        }, 30);
+    }, [downloadState]);
+
+    const getButtonContent = useCallback(() => {
+        switch (downloadState) {
+            case 'downloading':
+                return `Downloading... ${progress}%`;
+            case 'completed':
+                return (
+                    <>
+                        <CheckCircleIcon className="w-6 h-6 mr-2" /> Download Complete
+                    </>
+                );
+            case 'idle':
+            default:
+                return (
+                    <>
+                        <ArrowDownTrayIcon className="w-6 h-6 mr-2" /> {content[lang].download.cta} v1.0.0
+                    </>
+                );
+        }
+    }, [downloadState, progress, lang]);
+
+    return (
+        <Section id="download">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-white">{content[lang].download.title}</h2>
+                    <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{content[lang].download.subtitle}</p>
+                    <Button
+                        onClick={startDownload}
+                        disabled={downloadState === 'downloading'}
+                        className="mt-8 text-lg relative overflow-hidden w-full sm:w-auto min-w-[320px] text-center"
+                    >
+                        <div
+                            className="absolute top-0 left-0 h-full bg-primary-dark/30 dark:bg-primary-light/20 transition-all duration-150 ease-linear"
+                            style={{ width: `${progress}%` }}
+                        />
+                        <span className="relative z-10 flex items-center justify-center w-full">
+                            {getButtonContent()}
+                        </span>
+                    </Button>
+                    <p className="mt-2 text-sm text-slate-500">{content[lang].download.releaseNotes}</p>
+                </div>
+                <div className="bg-slate-100 dark:bg-slate-800 p-8 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-soft-lg">
+                    <h3 className="font-bold text-slate-700 dark:text-slate-200">{content[lang].download.instructions.title}</h3>
+                    <ul className="mt-4 space-y-3 text-slate-600 dark:text-slate-400">
+                        {content[lang].download.instructions.steps.map((step, i) => (
+                            <li key={i} className="flex items-start gap-3">
+                                <CheckCircleIcon className="w-5 h-5 text-accent-DEFAULT mt-1 flex-shrink-0" />
+                                <span>{step}</span>
+                            </li>
+                        ))}
+                    </ul>
+                    <div className="mt-6 border-t border-slate-200 dark:border-slate-700 pt-6">
+                        <h3 className="font-bold text-slate-700 dark:text-slate-200">{content[lang].download.requirements.title}</h3>
+                        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                            {content[lang].download.requirements.browser}
+                            <br />
+                            {content[lang].download.requirements.resolution}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </Section>
+    );
+};
+
 
 const Guide: React.FC<{ lang: Language }> = ({ lang }) => (
   <Section id="guide" className="bg-slate-50 dark:bg-slate-900">
