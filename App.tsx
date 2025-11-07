@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { content } from './constants';
 import { Language } from './types';
-import { LogoIcon, ChevronDownIcon, SunIcon, MoonIcon, ExternalLinkIcon, CheckCircleIcon, LockClosedIcon, AccessibilityIcon, LayersIcon, ClipboardIcon } from './components/Icons';
+import { LogoIcon, ChevronDownIcon, SunIcon, MoonIcon, ExternalLinkIcon, CheckCircleIcon, LockClosedIcon, AccessibilityIcon, LayersIcon, ClipboardIcon, LinkIcon } from './components/Icons';
 
 // Helper Components
 // ===============================================
@@ -48,7 +48,9 @@ const Button = React.forwardRef<
     return (
       <a
         ref={ref as React.Ref<HTMLAnchorElement>}
-        {...rest}
+        // Fix: Cast `rest` to the correct anchor attributes type to resolve TypeScript error.
+        // This is a common workaround for a TypeScript limitation with spreading discriminated unions.
+        {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
         className={className}
         role="button"
       >
@@ -73,6 +75,31 @@ Button.displayName = 'Button';
 // Main App Sections
 // ===============================================
 
+const CopyLinkButton: React.FC = () => {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = useCallback(() => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    }, []);
+
+    return (
+        <button
+            onClick={handleCopy}
+            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            aria-label="Copy page link"
+            title={copied ? 'Link Copied!' : 'Copy Link'}
+        >
+            {copied ? (
+                <CheckCircleIcon className="w-6 h-6 text-accent-DEFAULT" />
+            ) : (
+                <LinkIcon className="w-6 h-6 text-slate-600 dark:text-slate-300" />
+            )}
+        </button>
+    );
+};
+
 const Header: React.FC<{ lang: Language; setLang: (lang: Language) => void; isDarkMode: boolean; setDarkMode: (isDark: boolean) => void; }> = ({ lang, setLang, isDarkMode, setDarkMode }) => {
   return (
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800">
@@ -87,12 +114,12 @@ const Header: React.FC<{ lang: Language; setLang: (lang: Language) => void; isDa
           <a href="#guide" className="text-slate-600 dark:text-slate-300 hover:text-primary-DEFAULT dark:hover:text-primary-light transition-colors">가이드</a>
           <a href="#faq" className="text-slate-600 dark:text-slate-300 hover:text-primary-DEFAULT dark:hover:text-primary-light transition-colors">FAQ</a>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <div className="relative">
             <select
               value={lang}
               onChange={(e) => setLang(e.target.value as Language)}
-              className="appearance-none bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-1.5 pl-4 pr-8 text-sm font-medium text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-light"
+              className="appearance-none bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-1.5 pl-4 pr-8 text-sm font-medium text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-DEFAULT dark:focus:border-primary-light transition-colors"
               aria-label="Select language"
             >
               <option value="ko">한국어</option>
@@ -100,6 +127,7 @@ const Header: React.FC<{ lang: Language; setLang: (lang: Language) => void; isDa
             </select>
             <ChevronDownIcon className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
           </div>
+          <CopyLinkButton />
           <button onClick={() => setDarkMode(!isDarkMode)} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Toggle dark mode">
             {isDarkMode ? <SunIcon className="w-6 h-6 text-slate-300" /> : <MoonIcon className="w-6 h-6 text-slate-600" />}
           </button>
