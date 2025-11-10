@@ -1,0 +1,22 @@
+
+{
+  "latest": "1.2.3",
+  "notes": "초기 릴리즈: 버그 수정 및 성능 개선",
+  "assets": [
+    {
+      "os": "windows",
+      "url": "https://example.com/downloads/app-1.2.3-win.exe",
+      "sha256": "..."
+    },
+    {
+      "os": "macos",
+      "url": "https://example.com/downloads/app-1.2.3-mac.dmg",
+      "sha256": "..."
+    },
+    {
+      "os": "linux",
+      "url": "https://example.com/downloads/app-1.2.3-linux.AppImage",
+      "sha256": "..."
+    }
+  ]
+}
