@@ -17,17 +17,8 @@ export async function POST(request: Request) {
     console.log('New Support Inquiry Received:');
     console.log({ name, email, title, message });
 
-    // --- TODO: Integrate a real email/ticketing service here ---
-    // Example:
-    // await resend.emails.send({
-    //   from: 'onboarding@resend.dev',
-    //   to: 'your-support-email@example.com',
-    //   subject: `[Support] ${title}`,
-    //   html: `<p>From: ${name} &lt;${email}&gt;</p><div>${message}</div>`,
-    // });
-    // -----------------------------------------------------------
-
-    return NextResponse.json({ message: 'Inquiry received successfully!' }, { status: 200 });
+    // At this time we only validate and echo success.
+    return NextResponse.json({ ok: true }, { status: 200 });
 
   } catch (error) {
     console.error('API Error:', error);
