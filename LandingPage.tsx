@@ -89,6 +89,11 @@ const Features: React.FC = () => {
                         </div>
                     ))}
                 </div>
+                <div className="mt-16 text-center">
+                    <Button href="#download" variant="primary">
+                        {content[Language.KO].footer.links.download}
+                    </Button>
+                </div>
             </div>
         </section>
     );
