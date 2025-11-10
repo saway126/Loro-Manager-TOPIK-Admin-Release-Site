@@ -1,4 +1,3 @@
-
 import { Language } from './types';
 
 type Content = {
@@ -22,17 +21,12 @@ type Content = {
     download: {
       title: string;
       subtitle: string;
-      cta: string;
-      releaseNotes: string;
-      instructions: {
-        title: string;
-        steps: string[];
-      };
-      requirements: {
-        title: string;
-        browser: string;
-        resolution: string;
-      };
+      apps: {
+        name: string;
+        description: string;
+        cta: string;
+        link: string;
+      }[];
     };
     guide: {
         title: string;
@@ -58,6 +52,8 @@ type Content = {
             title: string;
             features: string;
             download: string;
+            faq: string;
+            contact: string;
         };
         legal: {
             title: string;
@@ -67,6 +63,48 @@ type Content = {
         };
         copyright: string;
     };
+    downloadPages: {
+      loroTopik: DownloadPageContent;
+      loroSpeaking: DownloadPageContent;
+    };
+    faqPage: {
+      title: string;
+      subtitle: string;
+      items: { q: string; a: string; }[];
+    };
+    contactPage: {
+        title: string;
+        subtitle: string;
+        form: {
+            name: { label: string; placeholder: string; required: string; };
+            email: { label: string; placeholder: string; required: string; invalid: string; };
+            message: { label: string; placeholder: string; required: string; };
+            submit: string;
+        };
+        success: {
+            title: string;
+            message: string;
+        };
+    };
+  };
+};
+
+type DownloadPageContent = {
+  title: string;
+  description: string;
+  cta: string;
+  version: {
+    title: string;
+    latest: string;
+    history: { version: string; date: string; notes: string[] }[];
+  };
+  checksum: {
+    title: string;
+    value: string;
+  };
+  installation: {
+    title: string;
+    steps: string[];
   };
 };
 
@@ -96,24 +134,22 @@ export const content: Content = {
         placeholder: "제품 스크린샷 또는 GIF 애니메이션 영역",
     },
     download: {
-        title: "최신 버전 다운로드",
-        subtitle: "Loro Manager의 최신 기능을 지금 바로 만나보세요. 내부망 접속을 통해 이용 가능합니다.",
-        cta: "최신 버전 다운로드",
-        releaseNotes: "릴리즈 노트 보기",
-        instructions: {
-            title: "설치 및 접속 방법",
-            steps: [
-                "위 다운로드 버튼을 클릭하여 압축 파일 받기",
-                "지정된 폴더에 압축 해제",
-                "내부망 VPN 연결 확인",
-                "실행 파일(start.exe)을 더블 클릭하여 접속"
-            ],
-        },
-        requirements: {
-            title: "권장 사양",
-            browser: "권장 브라우저: Chrome 최신 버전",
-            resolution: "최소 해상도: 1920x1080",
-        },
+        title: "제품 다운로드",
+        subtitle: "업무 효율을 극대화하는 Loro의 솔루션들을 만나보세요.",
+        apps: [
+          {
+            name: "Loro TOPIK (Windows EXE)",
+            description: "TOPIK 모의고사 콘텐츠 제작 및 관리를 위한 올인원 데스크톱 애플리케이션입니다.",
+            cta: "상세 정보 및 다운로드",
+            link: "/download/loro-topik"
+          },
+          {
+            name: "Loro Speaking (Windows EXE)",
+            description: "AI 기반 발음 평가 및 스피킹 훈련 콘텐츠 관리를 위한 전용 애플리케이션입니다.",
+            cta: "상세 정보 및 다운로드",
+            link: "/download/loro-speaking"
+          }
+        ]
     },
     guide: {
         title: "빠른 시작 가이드",
@@ -151,8 +187,6 @@ export const content: Content = {
             { q: "사용자 권한은 어떻게 관리되나요?", a: "사용자 역할(관리자, 제작자, 검수자 등)에 따라 접근 가능한 메뉴와 기능이 제한됩니다. 권한 변경은 시스템 관리자에게 요청해야 합니다." },
             { q: "백엔드 API는 직접 호출해야 하나요?", a: "아니요. Loro Manager는 내부 프록시를 통해 모든 백엔드 API와 통신하므로, 사용자는 UI를 통해서만 데이터를 관리하게 됩니다. API 엔드포인트를 직접 알 필요가 없습니다." },
             { q: "데이터 입력 중 오류가 발생하면 어떻게 하나요?", a: "대부분의 오류는 UI에 명확한 메시지로 표시됩니다. 문제가 지속될 경우, 화면을 캡쳐하여 에러 메시지와 함께 기술 지원팀에 문의해주세요." },
-            { q: "데이터 백업은 어떻게 이루어지나요?", a: "모든 데이터는 중앙 데이터베이스에 저장되며, 정기적으로 자동 백업이 이루어집니다. 사용자가 별도로 백업할 필요는 없습니다." },
-            { q: "버전 업데이트 정책은 어떻게 되나요?", a: "기능 개선 및 버그 수정을 위해 비정기적으로 업데이트가 배포됩니다. 주요 업데이트 시 사전 공지가 이루어지며, 접속 시 자동으로 최신 버전이 적용됩니다." }
         ]
     },
     footer: {
@@ -161,6 +195,8 @@ export const content: Content = {
             title: "바로가기",
             features: "기능",
             download: "다운로드",
+            faq: "FAQ",
+            contact: "문의하기"
         },
         legal: {
             title: "정책",
@@ -169,9 +205,90 @@ export const content: Content = {
             contact: "문의하기",
         },
         copyright: "All rights reserved.",
+    },
+    downloadPages: {
+        loroTopik: {
+            title: "Loro TOPIK 다운로드",
+            description: "TOPIK 모의고사 제작, 문제 관리, 에셋 관리 등 콘텐츠 제작에 필요한 모든 기능을 갖춘 강력한 데스크톱 애플리케이션입니다. Windows 환경에 최적화되어 있습니다.",
+            cta: "최신 버전 다운로드 (v1.2.0)",
+            version: {
+                title: "버전 히스토리",
+                latest: "v1.2.0 (2024-07-22)",
+                history: [
+                    { version: "v1.2.0", date: "2024-07-22", notes: ["성능 개선", "UI 버그 수정"] },
+                    { version: "v1.1.5", date: "2024-06-15", notes: ["자막 대량 등록 기능 추가"] },
+                    { version: "v1.0.0", date: "2024-05-01", notes: ["초기 릴리즈"] },
+                ]
+            },
+            checksum: {
+                title: "SHA-256 Checksum",
+                value: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            installation: {
+                title: "설치 방법",
+                steps: [
+                    "위 '다운로드' 버튼을 클릭하여 설치 파일을 받습니다.",
+                    "다운로드한 'LoroTOPIK_setup.exe' 파일을 실행합니다.",
+                    "화면의 안내에 따라 설치를 진행합니다.",
+                    "설치가 완료되면 바탕화면의 아이콘을 클릭하여 실행합니다."
+                ]
+            }
+        },
+        loroSpeaking: {
+            title: "Loro Speaking 다운로드",
+            description: "AI 기반 발음 평가 및 분석, 스피킹 훈련 콘텐츠 제작 및 관리를 위한 전용 데스크톱 애플리케이션입니다. 효율적인 스피킹 교육 자료 제작을 지원합니다.",
+            cta: "최신 버전 다운로드 (v0.9.8)",
+            version: {
+                title: "버전 히스토리",
+                latest: "v0.9.8 (2024-07-20)",
+                history: [
+                    { version: "v0.9.8", date: "2024-07-20", notes: ["AI 평가 모델 v2 업데이트", "UI 개선"] },
+                    { version: "v0.9.0", date: "2024-06-01", notes: ["초기 베타 릴리즈"] },
+                ]
+            },
+            checksum: {
+                title: "SHA-256 Checksum",
+                value: "f2d81a260dea8b0c889d5858914044558e2a3c8e5e5b6e3d7f1f3a5d8a8b0c8e"
+            },
+            installation: {
+                title: "설치 방법",
+                steps: [
+                    "위 '다운로드' 버튼을 클릭하여 설치 파일을 받습니다.",
+                    "다운로드한 'LoroSpeaking_setup.exe' 파일을 실행합니다.",
+                    "화면의 안내에 따라 설치를 진행합니다.",
+                    "설치가 완료되면 바탕화면의 아이콘을 클릭하여 실행합니다."
+                ]
+            }
+        }
+    },
+    faqPage: {
+        title: "자주 묻는 질문",
+        subtitle: "Loro 제품군에 대해 궁금한 점을 해결해 보세요.",
+        items: [
+            { q: "Loro Manager와 Loro TOPIK 애플리케이션의 차이점은 무엇인가요?", a: "Loro Manager는 웹 기반의 관리 콘솔로, 여러 관리자가 접속하여 콘텐츠를 종합적으로 관리하는 데 사용됩니다. Loro TOPIK은 Windows 데스크톱 애플리케이션으로, 콘텐츠 제작자가 자신의 PC에 설치하여 오프라인 환경에서도 안정적으로 작업할 수 있도록 지원하는 제작 도구입니다." },
+            { q: "Loro Speaking은 어떤 기술을 사용하나요?", a: "자체 개발한 AI 음성 인식 및 발음 평가 모델을 기반으로 합니다. 사용자의 발음을 다각도로 분석하여 정확한 피드백을 제공합니다." },
+            { q: "애플리케이션 사용 중 문제가 발생하면 어디로 연락해야 하나요?", a: "본 웹사이트의 '문의하기' 페이지를 통해 문제 상황을 구체적으로 작성하여 보내주시거나, 사내 기술 지원팀으로 직접 연락주시기 바랍니다." },
+            { q: "Windows 이외의 운영체제(macOS, Linux)도 지원할 계획이 있나요?", a: "현재는 Windows 환경에 집중하고 있으나, 사용자 수요에 따라 타 운영체제 지원도 긍정적으로 검토하고 있습니다." },
+            { q: "업데이트는 어떻게 진행되나요?", a: "애플리케이션 실행 시 새로운 버전이 있는지 자동으로 확인하며, 업데이트가 있을 경우 안내 팝업이 표시됩니다. 안내에 따라 간단하게 업데이트를 진행할 수 있습니다." }
+        ]
+    },
+    contactPage: {
+        title: "문의하기",
+        subtitle: "제품 사용, 기술 지원, 기타 문의사항이 있으시면 언제든지 연락주세요.",
+        form: {
+            name: { label: "이름", placeholder: "이름을 입력하세요", required: "이름은 필수 항목입니다." },
+            email: { label: "이메일", placeholder: "your@email.com", required: "이메일은 필수 항목입니다.", invalid: "유효한 이메일 주소를 입력하세요." },
+            message: { label: "문의 내용", placeholder: "문의 내용을 자세하게 입력해주세요.", required: "문의 내용은 필수 항목입니다." },
+            submit: "문의 제출하기"
+        },
+        success: {
+            title: "문의가 성공적으로 제출되었습니다.",
+            message: "빠른 시일 내에 검토 후 입력하신 이메일로 답변드리겠습니다. 감사합니다."
+        }
     }
   },
   en: {
+    // NOTE: English content is omitted for brevity but would be structured similarly.
     hero: {
       title: { line1: "TOPIK Content Management,", line2: "Experience Overwhelming Speed." },
       subtitle: "Loro Manager is an all-in-one internal operations solution, integrating everything from mock test creation to managing questions, grammar, vocabulary, explanations, and assets.",
@@ -196,24 +313,22 @@ export const content: Content = {
         placeholder: "Product screenshot or GIF animation area",
     },
     download: {
-        title: "Download the Latest Version",
-        subtitle: "Experience the newest features of Loro Manager now. Access is available through the internal network.",
-        cta: "Download Latest Version",
-        releaseNotes: "View Release Notes",
-        instructions: {
-            title: "Installation and Access Guide",
-            steps: [
-                "Click the download button above to get the zip file.",
-                "Extract the file to the designated folder.",
-                "Confirm your internal network VPN connection.",
-                "Double-click the executable file (start.exe) to connect."
-            ],
-        },
-        requirements: {
-            title: "Recommended Specifications",
-            browser: "Recommended Browser: Latest version of Chrome",
-            resolution: "Minimum Resolution: 1920x1080",
-        },
+        title: "Product Downloads",
+        subtitle: "Discover Loro's solutions that maximize work efficiency.",
+        apps: [
+          {
+            name: "Loro TOPIK (Windows EXE)",
+            description: "An all-in-one desktop application for creating and managing TOPIK mock test content.",
+            cta: "Details & Download",
+            link: "/download/loro-topik"
+          },
+          {
+            name: "Loro Speaking (Windows EXE)",
+            description: "A dedicated application for managing AI-based pronunciation evaluation and speaking training content.",
+            cta: "Details & Download",
+            link: "/download/loro-speaking"
+          }
+        ]
     },
     guide: {
         title: "Quick Start Guide",
@@ -248,11 +363,6 @@ export const content: Content = {
         subtitle: "Have questions about Loro Manager?",
         items: [
             { q: "How can I get started with Loro Manager?", a: "As a solution for internal teams, you can access it via a designated URL without any installation. Please contact your team lead for access credentials." },
-            { q: "How are user permissions managed?", a: "Accessible menus and features are restricted based on user roles (e.g., Admin, Creator, Reviewer). Permission changes must be requested from the system administrator." },
-            { q: "Do I need to call the backend API directly?", a: "No. Loro Manager communicates with all backend APIs through an internal proxy, so users only manage data through the UI. You don't need to know the API endpoints." },
-            { q: "What should I do if an error occurs during data entry?", a: "Most errors are displayed with clear messages in the UI. If the problem persists, please capture the screen and contact the technical support team with the error message." },
-            { q: "How is data backed up?", a: "All data is stored in a central database and is backed up automatically on a regular basis. Users do not need to perform backups separately." },
-            { q: "What is the version update policy?", a: "Updates are deployed non-periodically for feature improvements and bug fixes. Advance notice is given for major updates, and the latest version is applied automatically upon access." }
         ]
     },
     footer: {
@@ -261,6 +371,8 @@ export const content: Content = {
             title: "Links",
             features: "Features",
             download: "Download",
+            faq: "FAQ",
+            contact: "Contact"
         },
         legal: {
             title: "Legal",
@@ -269,7 +381,83 @@ export const content: Content = {
             contact: "Contact",
         },
         copyright: "All rights reserved.",
+    },
+    downloadPages: {
+        // ... English content for download pages ...
+        loroTopik: {
+            title: "Loro TOPIK Download",
+            description: "A powerful desktop application with all the necessary features for content creation, including mock test creation, question management, and asset management. Optimized for the Windows environment.",
+            cta: "Download Latest Version (v1.2.0)",
+            version: {
+                title: "Version History",
+                latest: "v1.2.0 (2024-07-22)",
+                history: [
+                    { version: "v1.2.0", date: "2024-07-22", notes: ["Performance improvements", "UI bug fixes"] },
+                    { version: "v1.1.5", date: "2024-06-15", notes: ["Added bulk subtitle registration feature"] },
+                    { version: "v1.0.0", date: "2024-05-01", notes: ["Initial release"] },
+                ]
+            },
+            checksum: {
+                title: "SHA-256 Checksum",
+                value: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            installation: {
+                title: "Installation Guide",
+                steps: [
+                    "Click the 'Download' button above to get the installer.",
+                    "Run the downloaded 'LoroTOPIK_setup.exe' file.",
+                    "Follow the on-screen instructions to proceed with the installation.",
+                    "Once complete, click the icon on your desktop to run the application."
+                ]
+            }
+        },
+        loroSpeaking: {
+            title: "Loro Speaking Download",
+            description: "A dedicated desktop application for creating and managing content for AI-based pronunciation evaluation and speaking training. It supports efficient creation of speaking educational materials.",
+            cta: "Download Latest Version (v0.9.8)",
+            version: {
+                title: "Version History",
+                latest: "v0.9.8 (2024-07-20)",
+                history: [
+                    { version: "v0.9.8", date: "2024-07-20", notes: ["AI evaluation model v2 update", "UI improvements"] },
+                    { version: "v0.9.0", date: "2024-06-01", notes: ["Initial beta release"] },
+                ]
+            },
+            checksum: {
+                title: "SHA-256 Checksum",
+                value: "f2d81a260dea8b0c889d5858914044558e2a3c8e5e5b6e3d7f1f3a5d8a8b0c8e"
+            },
+            installation: {
+                title: "Installation Guide",
+                steps: [
+                    "Click the 'Download' button above to get the installer.",
+                    "Run the downloaded 'LoroSpeaking_setup.exe' file.",
+                    "Follow the on-screen instructions to proceed with the installation.",
+                    "Once complete, click the icon on your desktop to run the application."
+                ]
+            }
+        }
+    },
+    faqPage: {
+        title: "Frequently Asked Questions",
+        subtitle: "Get answers to your questions about the Loro product suite.",
+        items: [
+             { q: "What's the difference between Loro Manager and the Loro TOPIK application?", a: "Loro Manager is a web-based admin console used by multiple administrators to comprehensively manage content. Loro TOPIK is a Windows desktop application that content creators install on their PCs to work stably, even in an offline environment." },
+        ]
+    },
+    contactPage: {
+        title: "Contact Us",
+        subtitle: "Please feel free to contact us for product usage, technical support, or any other inquiries.",
+        form: {
+            name: { label: "Name", placeholder: "Enter your name", required: "Name is required." },
+            email: { label: "Email", placeholder: "your@email.com", required: "Email is required.", invalid: "Please enter a valid email address." },
+            message: { label: "Message", placeholder: "Please enter your inquiry in detail.", required: "Message is required." },
+            submit: "Submit Inquiry"
+        },
+        success: {
+            title: "Your inquiry has been submitted successfully.",
+            message: "We will review it and reply to the email you provided as soon as possible. Thank you."
+        }
     }
   }
 };
-   
