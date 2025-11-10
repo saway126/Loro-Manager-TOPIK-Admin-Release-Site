@@ -1,20 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { LogoIcon, SunIcon, MoonIcon } from './components/Icons';
 import { content } from './constants';
 import { Language } from './types';
+import { RouterContext } from './App';
 
 interface PageProps {
     isDarkMode: boolean;
     setDarkMode: () => void;
 }
 
-const navigate = (href: string) => {
-    if (!href) return;
-    window.history.pushState({}, '', href);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-};
-
 const NavLink: React.FC<React.AnchorHTMLAttributes<HTMLAnchorElement>> = ({ href, children, className }) => {
+    const { navigate } = useContext(RouterContext);
+    
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         if (!href || href.startsWith('http') || href.startsWith('#')) {
             return;
@@ -28,6 +25,7 @@ const NavLink: React.FC<React.AnchorHTMLAttributes<HTMLAnchorElement>> = ({ href
 
 
 export const LinkButton: React.FC<React.AnchorHTMLAttributes<HTMLAnchorElement> & { variant?: 'primary' | 'secondary' }> = ({ variant = 'primary', children, ...props }) => {
+    const { navigate } = useContext(RouterContext);
     const baseClasses = "inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 text-base shadow-soft-lg";
     const variantClasses = {
         primary: 'bg-primary-DEFAULT text-white hover:bg-primary-dark focus:ring-primary-light',
@@ -50,23 +48,6 @@ export const LinkButton: React.FC<React.AnchorHTMLAttributes<HTMLAnchorElement> 
 
 export const Header: React.FC<PageProps> = ({ isDarkMode, setDarkMode }) => {
     const c = content[Language.KO];
-    const [isLanding, setIsLanding] = React.useState(window.location.pathname === '/');
-
-    React.useEffect(() => {
-        const checkPath = () => setIsLanding(window.location.pathname === '/');
-        window.addEventListener('popstate', checkPath);
-        
-        const originalPushState = history.pushState;
-        history.pushState = function() {
-            originalPushState.apply(this, arguments);
-            checkPath();
-        };
-
-        return () => {
-            window.removeEventListener('popstate', checkPath);
-            history.pushState = originalPushState;
-        }
-    }, []);
 
     return (
         <header className="sticky top-0 z-40 w-full backdrop-blur-sm bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
@@ -74,20 +55,19 @@ export const Header: React.FC<PageProps> = ({ isDarkMode, setDarkMode }) => {
                 <div className="flex items-center justify-between h-20">
                     <NavLink href="/" className="flex items-center gap-3">
                         <LogoIcon />
-                        <span className="text-xl font-bold text-slate-800 dark:text-white">Loro Manager</span>
+                        <span className="text-xl font-bold text-slate-800 dark:text-white">{c.header.brandName}</span>
                     </NavLink>
                     <div className="flex items-center gap-4">
                         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
-                            <NavLink href={isLanding ? "#features" : "/#features"} className="hover:text-primary-DEFAULT transition-colors">{c.footer.links.features}</NavLink>
-                            <NavLink href={isLanding ? "#download" : "/download"} className="hover:text-primary-DEFAULT transition-colors">{c.footer.links.download}</NavLink>
-                            <NavLink href="/support/faq" className="hover:text-primary-DEFAULT transition-colors">{c.footer.links.faq}</NavLink>
-                            <NavLink href="/support/contact" className="hover:text-primary-DEFAULT transition-colors">{c.footer.links.contact}</NavLink>
+                            <NavLink href="/topik" className="hover:text-primary-DEFAULT transition-colors">{c.footer.nav.topik}</NavLink>
+                            <NavLink href="/speaking" className="hover:text-primary-DEFAULT transition-colors">{c.footer.nav.speaking}</NavLink>
+                            <NavLink href="/support/faq" className="hover:text-primary-DEFAULT transition-colors">{c.footer.nav.faq}</NavLink>
+                            <NavLink href="/support/contact" className="hover:text-primary-DEFAULT transition-colors">{c.footer.nav.contact}</NavLink>
                         </nav>
                         <div className="hidden md:block w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
                         <button onClick={setDarkMode} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Toggle dark mode">
                             {isDarkMode ? <SunIcon className="w-6 h-6 text-slate-300" /> : <MoonIcon className="w-6 h-6 text-slate-600" />}
                         </button>
-                        <LinkButton href="/dashboard" variant="primary" className="hidden sm:inline-flex px-4 py-2 text-sm">{c.hero.ctaPrimary}</LinkButton>
                     </div>
                 </div>
             </div>
@@ -101,7 +81,7 @@ export const Footer: React.FC = () => {
         <footer className="bg-slate-100 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="text-center text-sm text-slate-500">
-                     © {new Date().getFullYear()} Loro. {c.copyright}
+                     © {new Date().getFullYear()} LORO. {c.copyright}
                 </div>
             </div>
         </footer>

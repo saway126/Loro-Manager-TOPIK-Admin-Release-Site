@@ -1,16 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useCallback } from 'react';
 import LandingPage from './LandingPage';
 import Dashboard from './Dashboard';
 import FaqPage from './FaqPage';
 import ContactPage from './ContactPage';
-import DownloadHubPage from './DownloadHubPage';
-import AppDetailPage from './AppDetailPage';
-import LoroTopikDownloadPage from './LoroTopikDownloadPage';
-import LoroSpeakingDownloadPage from './LoroSpeakingDownloadPage';
+import TopikPage from './TopikPage';
+import SpeakingPage from './SpeakingPage';
+
+interface RouterContextType {
+    path: string;
+    navigate: (href: string) => void;
+}
+
+// Create a context to provide routing information to child components
+export const RouterContext = createContext<RouterContextType>({
+    path: window.location.pathname,
+    navigate: () => console.warn('Navigate function called outside of Router context'),
+});
+
 
 export default function App() {
     const [isDarkMode, setDarkMode] = useState(false);
     const [path, setPath] = useState(window.location.pathname);
+
+    // Centralized navigation function that only updates internal state
+    const navigate = useCallback((href: string) => {
+        setPath(href);
+    }, []);
 
     useEffect(() => {
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -18,22 +33,6 @@ export default function App() {
         if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
             setDarkMode(true);
         }
-
-        const onLocationChange = () => {
-            setPath(window.location.pathname);
-        };
-        window.addEventListener('popstate', onLocationChange);
-        
-        const originalPushState = history.pushState;
-        history.pushState = function() {
-            originalPushState.apply(this, arguments);
-            onLocationChange();
-        };
-
-        return () => {
-            window.removeEventListener('popstate', onLocationChange);
-            history.pushState = originalPushState;
-        };
     }, []);
 
     useEffect(() => {
@@ -50,34 +49,25 @@ export default function App() {
     
     const props = { isDarkMode, setDarkMode: toggleDarkMode };
 
-    if (path.startsWith('/dashboard')) {
-        return <Dashboard {...props} />;
+    let page;
+    // Simple routing based on internal path state
+    if (path === '/dashboard') {
+        page = <Dashboard {...props} />;
+    } else if (path === '/topik') {
+        page = <TopikPage {...props} />;
+    } else if (path === '/speaking') {
+        page = <SpeakingPage {...props} />;
+    } else if (path === '/support/faq') {
+        page = <FaqPage {...props} />;
+    } else if (path === '/support/contact') {
+        page = <ContactPage {...props} />;
+    } else {
+        page = <LandingPage {...props} />;
     }
 
-    if (path.startsWith('/apps/')) {
-        const appName = path.split('/')[2] as 'topik' | 'speaking';
-        return <AppDetailPage appName={appName} {...props} />;
-    }
-    
-    if (path === '/download') {
-        return <DownloadHubPage {...props} />;
-    }
-
-    if (path === '/download/loro-topik') {
-        return <LoroTopikDownloadPage {...props} />;
-    }
-
-    if (path === '/download/loro-speaking') {
-        return <LoroSpeakingDownloadPage {...props} />;
-    }
-
-    if (path === '/support/faq') {
-        return <FaqPage {...props} />;
-    }
-    
-    if (path === '/support/contact') {
-        return <ContactPage {...props} />;
-    }
-
-    return <LandingPage {...props} />;
+    return (
+        <RouterContext.Provider value={{ path, navigate }}>
+            {page}
+        </RouterContext.Provider>
+    );
 }

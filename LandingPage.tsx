@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ExternalLinkIcon } from './components/Icons';
 import { content } from './constants';
 import { Language, ReleaseData } from './types';
 import { PageLayout, LinkButton } from './Layout';
+import { ArrowRightIcon } from './components/Icons';
 
 interface LandingPageProps {
     isDarkMode: boolean;
@@ -23,43 +23,13 @@ const Hero: React.FC = () => {
                 <p className="mt-6 max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-300">
                     {c.subtitle}
                 </p>
-                <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <LinkButton href="/dashboard" variant="primary">
-                        {c.ctaPrimary}
-                        <ExternalLinkIcon className="w-5 h-5" />
-                    </LinkButton>
-                    <LinkButton href="/download?tab=mobile" variant="secondary">{c.ctaSecondary}</LinkButton>
-                </div>
             </div>
         </section>
     );
 };
 
-const Features: React.FC = () => {
-    const c = content[Language.KO].features;
-    return (
-        <section id="features" className="py-20 sm:py-24 bg-slate-50 dark:bg-slate-900/50">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center">
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">{c.title}</h2>
-                    <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">{c.subtitle}</p>
-                </div>
-                <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    {c.items.map((item, index) => (
-                        <div key={index} className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-soft-lg border border-slate-200 dark:border-slate-700">
-                            <div className="text-3xl">{item.icon}</div>
-                            <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white">{item.title}</h3>
-                            <p className="mt-2 text-base text-slate-600 dark:text-slate-300">{item.description}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
-};
-
-const DownloadSection: React.FC = () => {
-    const c = content[Language.KO].download;
+const AppShowcase: React.FC = () => {
+    const c = content[Language.KO].mainPage;
     const [releaseData, setReleaseData] = useState<ReleaseData | null>(null);
 
     useEffect(() => {
@@ -77,33 +47,42 @@ const DownloadSection: React.FC = () => {
         fetchReleases();
     }, []);
 
+    const apps = [
+        { key: 'topik', data: c.apps.topik, detailUrl: '/topik' },
+        { key: 'speaking', data: c.apps.speaking, detailUrl: '/speaking' }
+    ] as const;
+
     return (
-        <section id="download" className="py-20 sm:py-24">
+        <section id="apps" className="py-20 sm:py-24 bg-slate-50 dark:bg-slate-900/50">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">{c.title}</h2>
                     <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">{c.subtitle}</p>
                 </div>
                 <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                    {c.apps.map((app) => {
-                        const appKey = app.name.toLowerCase().includes('topik') ? 'topik' : 'speaking';
-                        const mobileUrls = releaseData?.apps[appKey]?.mobile;
-                        
+                    {apps.map((app) => {
+                        const mobileUrls = releaseData?.apps[app.key]?.mobile;
                         return (
-                            <div key={app.name} className="bg-white dark:bg-slate-800/50 rounded-xl p-8 shadow-soft-lg border border-slate-200 dark:border-slate-700/50 flex flex-col">
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">{app.name}</h3>
-                                <p className="mt-2 text-slate-600 dark:text-slate-300 flex-grow">{app.description}</p>
-                                <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                                    {mobileUrls?.android && (
-                                        <LinkButton href={mobileUrls.android.storeUrl} variant="secondary" className="w-full text-sm !px-4 !py-2" target="_blank" rel="noopener noreferrer">
-                                            Google Play
-                                        </LinkButton>
-                                    )}
-                                    {mobileUrls?.ios && (
-                                        <LinkButton href={mobileUrls.ios.storeUrl} variant="secondary" className="w-full text-sm !px-4 !py-2" target="_blank" rel="noopener noreferrer">
-                                            App Store
-                                        </LinkButton>
-                                    )}
+                            <div key={app.key} className="bg-white dark:bg-slate-800/50 rounded-xl p-8 shadow-soft-lg border border-slate-200 dark:border-slate-700/50 flex flex-col text-center">
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{app.data.name}</h3>
+                                <p className="mt-2 text-slate-600 dark:text-slate-300 flex-grow">{app.data.description}</p>
+                                <div className="mt-8 flex flex-col gap-3">
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                        {mobileUrls?.android && (
+                                            <LinkButton href={mobileUrls.android.storeUrl} variant="secondary" className="w-full" target="_blank" rel="noopener noreferrer">
+                                                {c.buttons.googlePlay}
+                                            </LinkButton>
+                                        )}
+                                        {mobileUrls?.ios && (
+                                            <LinkButton href={mobileUrls.ios.storeUrl} variant="secondary" className="w-full" target="_blank" rel="noopener noreferrer">
+                                                {c.buttons.appStore}
+                                            </LinkButton>
+                                        )}
+                                    </div>
+                                    <LinkButton href={app.detailUrl} variant="primary">
+                                        {app.data.cta}
+                                        <ArrowRightIcon className="w-5 h-5" />
+                                    </LinkButton>
                                 </div>
                             </div>
                         )
@@ -118,8 +97,7 @@ export default function LandingPage({ isDarkMode, setDarkMode }: LandingPageProp
     return (
         <PageLayout isDarkMode={isDarkMode} setDarkMode={setDarkMode}>
             <Hero />
-            <Features />
-            <DownloadSection />
+            <AppShowcase />
         </PageLayout>
     );
 }
