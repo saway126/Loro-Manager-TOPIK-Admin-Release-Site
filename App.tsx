@@ -5,6 +5,10 @@ import FaqPage from './FaqPage';
 import ContactPage from './ContactPage';
 import LoroTopikDownloadPage from './LoroTopikDownloadPage';
 import LoroSpeakingDownloadPage from './LoroSpeakingDownloadPage';
+import MobileDownloadPage from './MobileDownloadPage';
+import SupportHubPage from './SupportHubPage';
+import PolicyPage from './PolicyPage';
+import ChangelogPage from './ChangelogPage';
 
 export default function App() {
     const [isDarkMode, setDarkMode] = useState(false);
@@ -47,26 +51,44 @@ export default function App() {
     }, [isDarkMode]);
 
     const toggleDarkMode = () => setDarkMode(prev => !prev);
+    
+    const props = { isDarkMode, setDarkMode: toggleDarkMode };
 
     if (path.startsWith('/dashboard')) {
-        return <Dashboard isDarkMode={isDarkMode} setDarkMode={toggleDarkMode} />;
+        return <Dashboard {...props} />;
     }
     
-    if (path === '/faq') {
-        return <FaqPage isDarkMode={isDarkMode} setDarkMode={toggleDarkMode} />;
+    if (path === '/download') {
+        return <MobileDownloadPage {...props} />;
+    }
+
+    if (path === '/support') {
+        return <SupportHubPage {...props} />;
+    }
+
+    if (path === '/support/faq') {
+        return <FaqPage {...props} />;
     }
     
     if (path === '/support/contact') {
-        return <ContactPage isDarkMode={isDarkMode} setDarkMode={toggleDarkMode} />;
+        return <ContactPage {...props} />;
+    }
+    
+    if (path === '/support/policy') {
+        return <PolicyPage {...props} />;
+    }
+
+    if (path === '/changelog') {
+        return <ChangelogPage {...props} />;
     }
     
     if (path === '/download/loro-topik') {
-        return <LoroTopikDownloadPage isDarkMode={isDarkMode} setDarkMode={toggleDarkMode} />;
+        return <LoroTopikDownloadPage {...props} />;
     }
     
     if (path === '/download/loro-speaking') {
-        return <LoroSpeakingDownloadPage isDarkMode={isDarkMode} setDarkMode={toggleDarkMode} />;
+        return <LoroSpeakingDownloadPage {...props} />;
     }
 
-    return <LandingPage isDarkMode={isDarkMode} setDarkMode={toggleDarkMode} />;
+    return <LandingPage {...props} />;
 }

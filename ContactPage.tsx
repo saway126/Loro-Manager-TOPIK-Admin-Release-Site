@@ -9,46 +9,42 @@ interface ContactPageProps {
     setDarkMode: () => void;
 }
 
+// Replace with your Formspree endpoint
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/your-id";
+
 export default function ContactPage({ isDarkMode, setDarkMode }: ContactPageProps) {
     const c = content[Language.KO].contactPage;
-    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-    const [errors, setErrors] = useState({ name: '', email: '', message: '' });
+    const faqCategories = content[Language.KO].faqPage.categories;
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const validate = () => {
-        const newErrors = { name: '', email: '', message: '' };
-        let isValid = true;
-        if (!formData.name) {
-            newErrors.name = c.form.name.required;
-            isValid = false;
-        }
-        if (!formData.email) {
-            newErrors.email = c.form.email.required;
-            isValid = false;
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = c.form.email.invalid;
-            isValid = false;
-        }
-        if (!formData.message) {
-            newErrors.message = c.form.message.required;
-            isValid = false;
-        }
-        setErrors(newErrors);
-        return isValid;
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (validate()) {
-            // Here you would typically send the data to an API
-            // For now, we'll just simulate a successful submission
-            console.log('Form data submitted:', formData);
-            setIsSubmitted(true);
-        }
-    };
+        setIsSubmitting(true);
+        const formData = new FormData(e.currentTarget);
+        
+        try {
+            const response = await fetch(FORMSPREE_ENDPOINT, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+            if (response.ok) {
+                setIsSubmitted(true);
+                e.currentTarget.reset();
+            } else {
+                // Handle server errors or validation errors from Formspree
+                alert("문의 제출에 실패했습니다. 잠시 후 다시 시도해주세요.");
+            }
+        } catch (error) {
+            // Handle network errors
+            alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -68,26 +64,43 @@ export default function ContactPage({ isDarkMode, setDarkMode }: ContactPageProp
                                 <p className="mt-2 text-slate-600 dark:text-slate-300">{c.success.message}</p>
                             </div>
                         ) : (
-                            <form onSubmit={handleSubmit} noValidate>
+                            <form onSubmit={handleSubmit}>
                                 <div className="space-y-6">
-                                    <div>
-                                        <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{c.form.name.label}</label>
-                                        <input type="text" name="name" id="name" value={formData.name} onChange={handleChange} placeholder={c.form.name.placeholder} className={`mt-1 block w-full bg-white dark:bg-slate-900/50 border rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm text-slate-800 dark:text-slate-200 ${errors.name ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-slate-300 dark:border-slate-600 focus:ring-primary-DEFAULT focus:border-primary-DEFAULT'}`} />
-                                        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        <div>
+                                            <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{c.form.name.label}</label>
+                                            <input type="text" name="name" id="name" required placeholder={c.form.name.placeholder} className="mt-1 block w-full bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT sm:text-sm text-slate-800 dark:text-slate-200" />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{c.form.email.label}</label>
+                                            <input type="email" name="email" id="email" required placeholder={c.form.email.placeholder} className="mt-1 block w-full bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT sm:text-sm text-slate-800 dark:text-slate-200" />
+                                        </div>
                                     </div>
                                     <div>
-                                        <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{c.form.email.label}</label>
-                                        <input type="email" name="email" id="email" value={formData.email} onChange={handleChange} placeholder={c.form.email.placeholder} className={`mt-1 block w-full bg-white dark:bg-slate-900/50 border rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm text-slate-800 dark:text-slate-200 ${errors.email ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-slate-300 dark:border-slate-600 focus:ring-primary-DEFAULT focus:border-primary-DEFAULT'}`} />
-                                        {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                                        <label htmlFor="category" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{c.form.category.label}</label>
+                                        <select id="category" name="category" className="mt-1 block w-full bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT sm:text-sm text-slate-800 dark:text-slate-200">
+                                            {faqCategories.map(cat => <option key={cat}>{cat}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{c.form.title.label}</label>
+                                        <input type="text" name="title" id="title" required placeholder={c.form.title.placeholder} className="mt-1 block w-full bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT sm:text-sm text-slate-800 dark:text-slate-200" />
                                     </div>
                                     <div>
                                         <label htmlFor="message" className="block text-sm font-medium text-slate-700 dark:text-slate-300">{c.form.message.label}</label>
-                                        <textarea name="message" id="message" rows={5} value={formData.message} onChange={handleChange} placeholder={c.form.message.placeholder} className={`mt-1 block w-full bg-white dark:bg-slate-900/50 border rounded-md shadow-sm py-2 px-3 focus:outline-none sm:text-sm text-slate-800 dark:text-slate-200 ${errors.message ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-slate-300 dark:border-slate-600 focus:ring-primary-DEFAULT focus:border-primary-DEFAULT'}`}></textarea>
-                                        {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
+                                        <textarea name="message" id="message" rows={5} required placeholder={c.form.message.placeholder} className="mt-1 block w-full bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT sm:text-sm text-slate-800 dark:text-slate-200"></textarea>
+                                    </div>
+                                    <div className="flex items-start">
+                                        <div className="flex items-center h-5">
+                                            <input id="consent" name="consent" type="checkbox" required className="focus:ring-primary-DEFAULT h-4 w-4 text-primary-DEFAULT border-slate-300 rounded" />
+                                        </div>
+                                        <div className="ml-3 text-sm">
+                                            <label htmlFor="consent" className="text-slate-600 dark:text-slate-300">{c.form.consent}</label>
+                                        </div>
                                     </div>
                                     <div>
-                                        <button type="submit" className="w-full inline-flex items-center justify-center px-6 py-3 font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 text-base shadow-soft-lg bg-primary-DEFAULT text-white hover:bg-primary-dark focus:ring-primary-light">
-                                            {c.form.submit}
+                                        <button type="submit" disabled={isSubmitting} className="w-full inline-flex items-center justify-center px-6 py-3 font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 text-base shadow-soft-lg bg-primary-DEFAULT text-white hover:bg-primary-dark focus:ring-primary-light disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed">
+                                            {isSubmitting ? c.form.submitting : c.form.submit}
                                         </button>
                                     </div>
                                 </div>

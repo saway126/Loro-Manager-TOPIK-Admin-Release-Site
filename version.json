@@ -1,0 +1,19 @@
+{
+  "version": "1.2.3",
+  "build": 45,
+  "platforms": {
+    "android": {
+      "minSupportedVersion": "1.0.0",
+      "forceUpdate": false,
+      "storeUrl": "https://play.google.com/store/apps/details?id=com.company.loro",
+      "releaseNotes": ["버그 수정", "성능 개선"]
+    },
+    "ios": {
+      "minSupportedVersion": "1.0.0",
+      "forceUpdate": false,
+      "storeUrl": "https://apps.apple.com/app/id1234567890",
+      "releaseNotes": ["UI 개선", "로그인 안정화"]
+    }
+  },
+  "publishedAt": "2025-11-10T01:23:45Z"
+}

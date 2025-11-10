@@ -1,7 +1,8 @@
-import { Language } from './types';
+import { Language, FaqItem } from './types';
 
 type Content = {
   [key in Language]: {
+    // ... existing content types
     hero: {
       title: { line1: string; line2: string; };
       subtitle: string;
@@ -54,6 +55,7 @@ type Content = {
             download: string;
             faq: string;
             contact: string;
+            support: string;
         };
         legal: {
             title: string;
@@ -70,7 +72,8 @@ type Content = {
     faqPage: {
       title: string;
       subtitle: string;
-      items: { q: string; a: string; }[];
+      categories: FaqItem['category'][];
+      items: FaqItem[];
     };
     contactPage: {
         title: string;
@@ -78,14 +81,53 @@ type Content = {
         form: {
             name: { label: string; placeholder: string; required: string; };
             email: { label: string; placeholder: string; required: string; invalid: string; };
+            category: { label: string; },
+            title: { label: string; placeholder: string; required: string; },
             message: { label: string; placeholder: string; required: string; };
+            consent: string;
             submit: string;
+            submitting: string;
         };
         success: {
             title: string;
             message: string;
         };
     };
+    // NEW CONTENT
+    mobileDownloadPage: {
+        title: string;
+        subtitle: string;
+        openApp: string;
+        android: string;
+        ios: string;
+        versionInfo: {
+            title: string;
+            loading: string;
+            version: string;
+            build: string;
+            notes: string;
+            publishedAt: string;
+        }
+    };
+    supportHubPage: {
+        title: string;
+        subtitle: string;
+        cards: {
+            faq: { title: string; description: string; cta: string; };
+            contact: { title: string; description: string; cta: string; };
+            policy: { title: string; description: string; cta: string; };
+        }
+    };
+    policyPage: {
+        title: string;
+        lastUpdated: string;
+        terms: { title: string; content: string; };
+        privacy: { title: string; content: string; };
+    };
+    changelogPage: {
+        title: string;
+        subtitle: string;
+    }
   };
 };
 
@@ -114,7 +156,7 @@ export const content: Content = {
       title: { line1: "TOPIK 콘텐츠 관리,", line2: "압도적인 속도를 경험하세요." },
       subtitle: "Loro Manager는 모의고사 제작부터 문제, 문법, 단어, 해설, 에셋 관리까지 모든 것을 하나로 통합한 내부 운영 솔루션입니다.",
       ctaPrimary: "관리 콘솔 바로가기",
-      ctaSecondary: "다운로드 / 문서 보기",
+      ctaSecondary: "모바일 앱 다운로드",
     },
     features: {
         title: "강력하고 직관적인 기능",
@@ -134,8 +176,8 @@ export const content: Content = {
         placeholder: "제품 스크린샷 또는 GIF 애니메이션 영역",
     },
     download: {
-        title: "제품 다운로드",
-        subtitle: "업무 효율을 극대화하는 Loro의 솔루션들을 만나보세요.",
+        title: "데스크톱 애플리케이션",
+        subtitle: "콘텐츠 제작 효율을 극대화하는 Loro의 윈도우용 솔루션입니다.",
         apps: [
           {
             name: "Loro TOPIK (Windows EXE)",
@@ -196,7 +238,8 @@ export const content: Content = {
             features: "기능",
             download: "다운로드",
             faq: "FAQ",
-            contact: "문의하기"
+            contact: "문의하기",
+            support: "고객센터"
         },
         legal: {
             title: "정책",
@@ -264,27 +307,86 @@ export const content: Content = {
     faqPage: {
         title: "자주 묻는 질문",
         subtitle: "Loro 제품군에 대해 궁금한 점을 해결해 보세요.",
+        categories: ["계정", "결제", "앱", "콘텐츠", "기타"],
         items: [
-            { q: "Loro Manager와 Loro TOPIK 애플리케이션의 차이점은 무엇인가요?", a: "Loro Manager는 웹 기반의 관리 콘솔로, 여러 관리자가 접속하여 콘텐츠를 종합적으로 관리하는 데 사용됩니다. Loro TOPIK은 Windows 데스크톱 애플리케이션으로, 콘텐츠 제작자가 자신의 PC에 설치하여 오프라인 환경에서도 안정적으로 작업할 수 있도록 지원하는 제작 도구입니다." },
-            { q: "Loro Speaking은 어떤 기술을 사용하나요?", a: "자체 개발한 AI 음성 인식 및 발음 평가 모델을 기반으로 합니다. 사용자의 발음을 다각도로 분석하여 정확한 피드백을 제공합니다." },
-            { q: "애플리케이션 사용 중 문제가 발생하면 어디로 연락해야 하나요?", a: "본 웹사이트의 '문의하기' 페이지를 통해 문제 상황을 구체적으로 작성하여 보내주시거나, 사내 기술 지원팀으로 직접 연락주시기 바랍니다." },
-            { q: "Windows 이외의 운영체제(macOS, Linux)도 지원할 계획이 있나요?", a: "현재는 Windows 환경에 집중하고 있으나, 사용자 수요에 따라 타 운영체제 지원도 긍정적으로 검토하고 있습니다." },
-            { q: "업데이트는 어떻게 진행되나요?", a: "애플리케이션 실행 시 새로운 버전이 있는지 자동으로 확인하며, 업데이트가 있을 경우 안내 팝업이 표시됩니다. 안내에 따라 간단하게 업데이트를 진행할 수 있습니다." }
+            { category: "앱", q: "Loro Manager와 Loro TOPIK 애플리케이션의 차이점은 무엇인가요?", a: "Loro Manager는 웹 기반의 관리 콘솔로, 여러 관리자가 접속하여 콘텐츠를 종합적으로 관리하는 데 사용됩니다. Loro TOPIK은 Windows 데스크톱 애플리케이션으로, 콘텐츠 제작자가 자신의 PC에 설치하여 오프라인 환경에서도 안정적으로 작업할 수 있도록 지원하는 제작 도구입니다." },
+            { category: "앱", q: "Loro Speaking은 어떤 기술을 사용하나요?", a: "자체 개발한 AI 음성 인식 및 발음 평가 모델을 기반으로 합니다. 사용자의 발음을 다각도로 분석하여 정확한 피드백을 제공합니다." },
+            { category: "기타", q: "애플리케이션 사용 중 문제가 발생하면 어디로 연락해야 하나요?", a: "본 웹사이트의 '고객센터 > 문의하기' 페이지를 통해 문제 상황을 구체적으로 작성하여 보내주시거나, 사내 기술 지원팀으로 직접 연락주시기 바랍니다." },
+            { category: "앱", q: "Windows 이외의 운영체제(macOS, Linux)도 지원할 계획이 있나요?", a: "현재는 Windows 환경에 집중하고 있으나, 사용자 수요에 따라 타 운영체제 지원도 긍정적으로 검토하고 있습니다." },
+            { category: "앱", q: "업데이트는 어떻게 진행되나요?", a: "애플리케이션 실행 시 새로운 버전이 있는지 자동으로 확인하며, 업데이트가 있을 경우 안내 팝업이 표시됩니다. 안내에 따라 간단하게 업데이트를 진행할 수 있습니다." },
+            { category: "계정", q: "비밀번호를 잊어버렸어요.", a: "로그인 화면의 '비밀번호 재설정' 링크를 통해 안내에 따라 재설정할 수 있습니다." },
+            { category: "결제", q: "결제 내역은 어디서 확인할 수 있나요?", a: "현재 Loro Manager는 내부용 솔루션으로 별도 결제 기능이 없습니다. 관련 문의는 관리 부서에 해주시기 바랍니다." }
         ]
     },
     contactPage: {
         title: "문의하기",
-        subtitle: "제품 사용, 기술 지원, 기타 문의사항이 있으시면 언제든지 연락주세요.",
+        subtitle: "제품 사용, 기술 지원, 기타 문의사항이 있으시면 언제든지 연락주세요. 문의 전 FAQ를 확인하시면 더 빠르게 답변을 얻으실 수 있습니다.",
         form: {
             name: { label: "이름", placeholder: "이름을 입력하세요", required: "이름은 필수 항목입니다." },
             email: { label: "이메일", placeholder: "your@email.com", required: "이메일은 필수 항목입니다.", invalid: "유효한 이메일 주소를 입력하세요." },
+            category: { label: "문의 유형" },
+            title: { label: "제목", placeholder: "제목을 입력하세요", required: "제목은 필수 항목입니다." },
             message: { label: "문의 내용", placeholder: "문의 내용을 자세하게 입력해주세요.", required: "문의 내용은 필수 항목입니다." },
-            submit: "문의 제출하기"
+            consent: "개인정보 수집 및 이용에 동의합니다.",
+            submit: "문의 제출하기",
+            submitting: "제출 중..."
         },
         success: {
             title: "문의가 성공적으로 제출되었습니다.",
             message: "빠른 시일 내에 검토 후 입력하신 이메일로 답변드리겠습니다. 감사합니다."
         }
+    },
+    mobileDownloadPage: {
+        title: "앱 다운로드",
+        subtitle: "Loro TOPIK / Loro Speaking을 모바일에서 만나보세요.",
+        openApp: "앱 열기",
+        android: "Android",
+        ios: "iOS",
+        versionInfo: {
+            title: "최신 버전 정보",
+            loading: "버전 정보를 불러오는 중…",
+            version: "버전",
+            build: "빌드",
+            notes: "릴리즈 노트",
+            publishedAt: "배포일"
+        }
+    },
+    supportHubPage: {
+        title: "고객센터",
+        subtitle: "무엇을 도와드릴까요? Loro 제품에 대한 지원 정보를 찾아보세요.",
+        cards: {
+            faq: {
+                title: "자주 묻는 질문 (FAQ)",
+                description: "계정, 앱 사용법 등 자주 묻는 질문에 대한 답변을 확인하세요.",
+                cta: "FAQ 바로가기"
+            },
+            contact: {
+                title: "문의하기",
+                description: "FAQ에서 해결되지 않는 문제나 기술 지원이 필요하신가요?",
+                cta: "문의하기"
+            },
+            policy: {
+                title: "약관 및 정책",
+                description: "서비스 이용약관과 개인정보 처리방침을 안내합니다.",
+                cta: "정책 보기"
+            }
+        }
+    },
+    policyPage: {
+        title: "약관 및 개인정보 처리방침",
+        lastUpdated: "최종 수정일: 2024년 8월 1일",
+        terms: {
+            title: "서비스 이용약관",
+            content: "서비스 이용약관 내용이 여기에 표시됩니다. 이 내용은 CMS나 마크다운 파일로 관리될 수 있습니다."
+        },
+        privacy: {
+            title: "개인정보 처리방침",
+            content: "개인정보 처리방침 내용이 여기에 표시됩니다. 이 내용은 CMS나 마크다운 파일로 관리될 수 있습니다."
+        }
+    },
+    changelogPage: {
+        title: "릴리즈 노트",
+        subtitle: "Loro 모바일 앱의 최신 업데이트 내역을 확인하세요."
     }
   },
   en: {
@@ -293,7 +395,7 @@ export const content: Content = {
       title: { line1: "TOPIK Content Management,", line2: "Experience Overwhelming Speed." },
       subtitle: "Loro Manager is an all-in-one internal operations solution, integrating everything from mock test creation to managing questions, grammar, vocabulary, explanations, and assets.",
       ctaPrimary: "Go to Admin Console",
-      ctaSecondary: "Download / View Docs",
+      ctaSecondary: "Download Mobile App",
     },
     features: {
         title: "Powerful and Intuitive Features",
@@ -313,8 +415,8 @@ export const content: Content = {
         placeholder: "Product screenshot or GIF animation area",
     },
     download: {
-        title: "Product Downloads",
-        subtitle: "Discover Loro's solutions that maximize work efficiency.",
+        title: "Desktop Applications",
+        subtitle: "Loro's Windows solutions to maximize content creation efficiency.",
         apps: [
           {
             name: "Loro TOPIK (Windows EXE)",
@@ -372,7 +474,8 @@ export const content: Content = {
             features: "Features",
             download: "Download",
             faq: "FAQ",
-            contact: "Contact"
+            contact: "Contact",
+            support: "Support"
         },
         legal: {
             title: "Legal",
@@ -441,8 +544,12 @@ export const content: Content = {
     faqPage: {
         title: "Frequently Asked Questions",
         subtitle: "Get answers to your questions about the Loro product suite.",
+        // FIX: Replaced English category names with Korean equivalents to match the FaqCategory type definition.
+        // A proper i18n solution would involve language-agnostic keys and translation at the component level.
+        categories: ["계정", "결제", "앱", "콘텐츠", "기타"],
         items: [
-             { q: "What's the difference between Loro Manager and the Loro TOPIK application?", a: "Loro Manager is a web-based admin console used by multiple administrators to comprehensively manage content. Loro TOPIK is a Windows desktop application that content creators install on their PCs to work stably, even in an offline environment." },
+             // FIX: Replaced English category name with Korean equivalent to match the FaqCategory type definition.
+             { category: "앱", q: "What's the difference between Loro Manager and the Loro TOPIK application?", a: "Loro Manager is a web-based admin console used by multiple administrators to comprehensively manage content. Loro TOPIK is a Windows desktop application that content creators install on their PCs to work stably, even in an offline environment." },
         ]
     },
     contactPage: {
@@ -451,13 +558,69 @@ export const content: Content = {
         form: {
             name: { label: "Name", placeholder: "Enter your name", required: "Name is required." },
             email: { label: "Email", placeholder: "your@email.com", required: "Email is required.", invalid: "Please enter a valid email address." },
+            category: { label: "Category" },
+            title: { label: "Subject", placeholder: "Enter a subject", required: "Subject is required." },
             message: { label: "Message", placeholder: "Please enter your inquiry in detail.", required: "Message is required." },
-            submit: "Submit Inquiry"
+            consent: "I agree to the collection and use of personal information.",
+            submit: "Submit Inquiry",
+            submitting: "Submitting..."
         },
         success: {
             title: "Your inquiry has been submitted successfully.",
             message: "We will review it and reply to the email you provided as soon as possible. Thank you."
         }
+    },
+    mobileDownloadPage: {
+        title: "App Download",
+        subtitle: "Get Loro TOPIK / Loro Speaking on your mobile device.",
+        openApp: "Open App",
+        android: "Android",
+        ios: "iOS",
+        versionInfo: {
+            title: "Latest Version",
+            loading: "Loading version info…",
+            version: "Version",
+            build: "Build",
+            notes: "Release Notes",
+            publishedAt: "Published At"
+        }
+    },
+    supportHubPage: {
+        title: "Support Center",
+        subtitle: "How can we help? Find support information for Loro products.",
+        cards: {
+            faq: { 
+                title: "FAQ",
+                description: "Find answers to common questions about accounts, app usage, and more.",
+                cta: "Go to FAQ"
+            },
+            contact: {
+                title: "Contact Us",
+                description: "Need help with an issue not covered in the FAQ or require technical support?",
+                cta: "Contact Us"
+            },
+            policy: {
+                title: "Terms & Policies",
+                description: "Read our Terms of Service and Privacy Policy.",
+                cta: "View Policies"
+            }
+        }
+    },
+    policyPage: {
+        title: "Terms & Privacy Policy",
+        lastUpdated: "Last Updated: August 1, 2024",
+        terms: {
+            title: "Terms of Service",
+            content: "The Terms of Service content will be displayed here. This can be managed via a CMS or a markdown file."
+        },
+        privacy: {
+            title: "Privacy Policy",
+            content: "The Privacy Policy content will be displayed here. This can be managed via a CMS or a markdown file."
+        }
+    },
+    changelogPage: {
+        title: "Release Notes",
+        subtitle: "Check out the latest updates for the Loro mobile apps."
     }
   }
 };

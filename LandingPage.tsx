@@ -28,7 +28,7 @@ const Hero: React.FC = () => {
                         {c.ctaPrimary}
                         <ExternalLinkIcon className="w-5 h-5" />
                     </LinkButton>
-                    <LinkButton href="#download" variant="secondary">{c.ctaSecondary}</LinkButton>
+                    <LinkButton href="/download" variant="secondary">{c.ctaSecondary}</LinkButton>
                 </div>
             </div>
         </section>
@@ -54,8 +54,8 @@ const Features: React.FC = () => {
                     ))}
                 </div>
                 <div className="mt-16 text-center">
-                    <LinkButton href="#download" variant="primary">
-                        {content[Language.KO].footer.links.download}
+                    <LinkButton href="/download" variant="primary">
+                        {content[Language.KO].hero.ctaSecondary}
                     </LinkButton>
                 </div>
             </div>
@@ -66,7 +66,7 @@ const Features: React.FC = () => {
 const Download: React.FC = () => {
     const c = content[Language.KO].download;
     return (
-        <section id="download" className="py-20 sm:py-24">
+        <section id="download-desktop" className="py-20 sm:py-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">{c.title}</h2>
@@ -80,7 +80,6 @@ const Download: React.FC = () => {
                             <div className="mt-6">
                                 <LinkButton href={app.link} variant="secondary" className="w-full text-sm !px-4 !py-2">
                                     {app.cta}
-                                    {/* FIX: Replaced inline SVG with ArrowRightIcon component */}
                                     <ArrowRightIcon className="w-4 h-4" />
                                 </LinkButton>
                             </div>
