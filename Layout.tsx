@@ -9,7 +9,6 @@ interface PageProps {
 }
 
 const navigate = (href: string) => {
-    // Prevent navigation if href is undefined or null
     if (!href) return;
     window.history.pushState({}, '', href);
     window.dispatchEvent(new PopStateEvent('popstate'));
@@ -37,7 +36,7 @@ export const LinkButton: React.FC<React.AnchorHTMLAttributes<HTMLAnchorElement> 
     const className = `${baseClasses} ${variantClasses[variant]} ${props.className || ''}`;
     
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-        if (props.href?.startsWith('http') || props.href?.startsWith('#')) {
+        if (props.href?.startsWith('http') || props.href?.startsWith('#') || props.target === '_blank') {
             return;
         }
         e.preventDefault();
@@ -79,8 +78,8 @@ export const Header: React.FC<PageProps> = ({ isDarkMode, setDarkMode }) => {
                     </NavLink>
                     <div className="flex items-center gap-4">
                         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
-                            <a href={isLanding ? "#features" : "/#features"} className="hover:text-primary-DEFAULT transition-colors">{c.footer.links.features}</a>
-                            <NavLink href="/download" className="hover:text-primary-DEFAULT transition-colors">{c.footer.links.download}</NavLink>
+                            <NavLink href={isLanding ? "#features" : "/#features"} className="hover:text-primary-DEFAULT transition-colors">{c.footer.links.features}</NavLink>
+                            <NavLink href={isLanding ? "#download" : "/download"} className="hover:text-primary-DEFAULT transition-colors">{c.footer.links.download}</NavLink>
                             <NavLink href="/support/faq" className="hover:text-primary-DEFAULT transition-colors">{c.footer.links.faq}</NavLink>
                             <NavLink href="/support/contact" className="hover:text-primary-DEFAULT transition-colors">{c.footer.links.contact}</NavLink>
                         </nav>
@@ -101,36 +100,8 @@ export const Footer: React.FC = () => {
     return (
         <footer className="bg-slate-100 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div>
-                        <div className="flex items-center gap-3">
-                            <LogoIcon />
-                            <span className="text-lg font-semibold text-slate-800 dark:text-white">Loro Manager</span>
-                        </div>
-                        <p className="mt-2 text-sm text-slate-500">{c.description}</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-8 md:col-span-2">
-                        <div className="md:justify-self-center">
-                            <h3 className="font-semibold text-slate-800 dark:text-white">{c.links.title}</h3>
-                            <ul className="mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-300">
-                                <li><NavLink href="/#features" className="hover:text-primary-DEFAULT">{c.links.features}</NavLink></li>
-                                <li><NavLink href="/download" className="hover:text-primary-DEFAULT">{c.links.download}</NavLink></li>
-                                <li><NavLink href="/support" className="hover:text-primary-DEFAULT">{c.links.support}</NavLink></li>
-                                <li><NavLink href="/changelog" className="hover:text-primary-DEFAULT">릴리즈 노트</NavLink></li>
-                            </ul>
-                        </div>
-                        <div className="md:justify-self-center">
-                            <h3 className="font-semibold text-slate-800 dark:text-white">{c.legal.title}</h3>
-                             <ul className="mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-300">
-                                <li><NavLink href="/support/policy" className="hover:text-primary-DEFAULT">{c.legal.privacy}</NavLink></li>
-                                <li><NavLink href="/support/policy" className="hover:text-primary-DEFAULT">{c.legal.terms}</NavLink></li>
-                                <li><NavLink href="/support/contact" className="hover:text-primary-DEFAULT">{c.legal.contact}</NavLink></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700 text-center text-sm text-slate-500">
-                     © {new Date().getFullYear()} Loro. {content.ko.footer.copyright}
+                <div className="text-center text-sm text-slate-500">
+                     © {new Date().getFullYear()} Loro. {c.copyright}
                 </div>
             </div>
         </footer>

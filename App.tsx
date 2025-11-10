@@ -3,12 +3,10 @@ import LandingPage from './LandingPage';
 import Dashboard from './Dashboard';
 import FaqPage from './FaqPage';
 import ContactPage from './ContactPage';
+import DownloadHubPage from './DownloadHubPage';
+import AppDetailPage from './AppDetailPage';
 import LoroTopikDownloadPage from './LoroTopikDownloadPage';
 import LoroSpeakingDownloadPage from './LoroSpeakingDownloadPage';
-import MobileDownloadPage from './MobileDownloadPage';
-import SupportHubPage from './SupportHubPage';
-import PolicyPage from './PolicyPage';
-import ChangelogPage from './ChangelogPage';
 
 export default function App() {
     const [isDarkMode, setDarkMode] = useState(false);
@@ -24,10 +22,8 @@ export default function App() {
         const onLocationChange = () => {
             setPath(window.location.pathname);
         };
-        // Listen for popstate events
         window.addEventListener('popstate', onLocationChange);
         
-        // Also handle custom navigation events for SPAs
         const originalPushState = history.pushState;
         history.pushState = function() {
             originalPushState.apply(this, arguments);
@@ -57,13 +53,22 @@ export default function App() {
     if (path.startsWith('/dashboard')) {
         return <Dashboard {...props} />;
     }
+
+    if (path.startsWith('/apps/')) {
+        const appName = path.split('/')[2] as 'topik' | 'speaking';
+        return <AppDetailPage appName={appName} {...props} />;
+    }
     
     if (path === '/download') {
-        return <MobileDownloadPage {...props} />;
+        return <DownloadHubPage {...props} />;
     }
 
-    if (path === '/support') {
-        return <SupportHubPage {...props} />;
+    if (path === '/download/loro-topik') {
+        return <LoroTopikDownloadPage {...props} />;
+    }
+
+    if (path === '/download/loro-speaking') {
+        return <LoroSpeakingDownloadPage {...props} />;
     }
 
     if (path === '/support/faq') {
@@ -72,22 +77,6 @@ export default function App() {
     
     if (path === '/support/contact') {
         return <ContactPage {...props} />;
-    }
-    
-    if (path === '/support/policy') {
-        return <PolicyPage {...props} />;
-    }
-
-    if (path === '/changelog') {
-        return <ChangelogPage {...props} />;
-    }
-    
-    if (path === '/download/loro-topik') {
-        return <LoroTopikDownloadPage {...props} />;
-    }
-    
-    if (path === '/download/loro-speaking') {
-        return <LoroSpeakingDownloadPage {...props} />;
     }
 
     return <LandingPage {...props} />;
