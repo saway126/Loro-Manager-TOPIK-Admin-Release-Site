@@ -27,11 +27,11 @@ export default function SupportPage() {
                 body: JSON.stringify(validation.data),
             });
             const result = await response.json();
-            if (response.ok) {
-                setFormState({ status: 'success', message: result.message || '문의가 성공적으로 전송되었습니다.' });
+            if (response.ok && result?.ok) {
+                setFormState({ status: 'success', message: '문의가 성공적으로 전송되었습니다.' });
                 (e.target as HTMLFormElement).reset();
             } else {
-                setFormState({ status: 'error', message: result.message || '오류가 발생했습니다. 다시 시도해주세요.' });
+                setFormState({ status: 'error', message: '오류가 발생했습니다. 다시 시도해주세요.' });
             }
         } catch (error) {
             setFormState({ status: 'error', message: '네트워크 오류가 발생했습니다.' });

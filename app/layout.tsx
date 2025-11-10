@@ -6,12 +6,16 @@ import "./globals.css";
 import { Header } from "./_components/Header";
 import { Footer } from "./_components/Footer";
 import { ThemeProvider } from "./_components/ThemeProvider";
+import siteMeta from "../metadata.json";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LORO - TOPIK Learning Solution",
-  description: "The official product release website for LORO, the all-in-one solution for TOPIK mock tests and AI speaking practice.",
+  title: siteMeta.name || "LORO - TOPIK Learning Solution",
+  description:
+    siteMeta.description ||
+    "The official product release website for LORO, the all-in-one solution for TOPIK mock tests and AI speaking practice.",
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({
@@ -25,7 +29,11 @@ export default function RootLayout({
         <ThemeProvider>
           <div className="antialiased">
             <Header />
-            <main>{children}</main>
+            <main>
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {children}
+              </div>
+            </main>
             <Footer />
           </div>
         </ThemeProvider>
