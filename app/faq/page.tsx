@@ -32,8 +32,8 @@ const AccordionItem: React.FC<{ q: string; a: string; }> = ({ q, a }) => {
 export default function FaqPage() {
     const [faqData, setFaqData] = useState<FaqData | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-    useEffect(() => {
+    //주석
+    useEffect(() => { // FIX: useEffect should be used to fetch data only once
         const fetchFaqs = async () => {
             try {
                 const res = await fetch('/data/faq.json');
