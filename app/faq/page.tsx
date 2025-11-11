@@ -32,7 +32,7 @@ const AccordionItem: React.FC<{ q: string; a: string; }> = ({ q, a }) => {
 export default function FaqPage() {
     const [faqData, setFaqData] = useState<FaqData | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
-    //주석
+    //주석1
     useEffect(() => { // FIX: useEffect should be used to fetch data only once
         const fetchFaqs = async () => {
             try {
