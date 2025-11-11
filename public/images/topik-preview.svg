@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e40af"/>
+      <stop offset="1" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" rx="24" fill="url(#g)"/>
+  <g fill="#ffffff" opacity="0.95">
+    <text x="60" y="120" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="700">Loro TOPIK</text>
+    <text x="60" y="170" font-family="Inter, system-ui, sans-serif" font-size="24" opacity="0.9">실전형 모의고사 · 학습 분석 · 일정 관리</text>
+    <rect x="60" y="220" width="840" height="240" rx="16" fill="#ffffff" opacity="0.1"/>
+    <rect x="90" y="250" width="240" height="180" rx="12" fill="#ffffff" opacity="0.25"/>
+    <rect x="360" y="250" width="510" height="40" rx="8" fill="#ffffff" opacity="0.25"/>
+    <rect x="360" y="300" width="390" height="24" rx="6" fill="#ffffff" opacity="0.2"/>
+    <rect x="360" y="340" width="450" height="24" rx="6" fill="#ffffff" opacity="0.2"/>
+    <rect x="360" y="380" width="330" height="24" rx="6" fill="#ffffff" opacity="0.2"/>
+  </g>
+</svg>
+
+

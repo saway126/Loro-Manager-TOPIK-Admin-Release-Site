@@ -16,6 +16,23 @@ export const metadata: Metadata = {
     siteMeta.description ||
     "The official product release website for LORO, the all-in-one solution for TOPIK mock tests and AI speaking practice.",
   icons: { icon: "/icon.svg" },
+  openGraph: {
+    title: siteMeta.name || "LORO - TOPIK Learning Solution",
+    description:
+      siteMeta.description ||
+      "The official product release website for LORO, the all-in-one solution for TOPIK mock tests and AI speaking practice.",
+    images: [{ url: "/images/topik-preview.svg" }],
+    siteName: "LORO",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteMeta.name || "LORO - TOPIK Learning Solution",
+    description:
+      siteMeta.description ||
+      "The official product release website for LORO, the all-in-one solution for TOPIK mock tests and AI speaking practice.",
+    images: ["/images/topik-preview.svg"],
+  },
 };
 
 export default function RootLayout({

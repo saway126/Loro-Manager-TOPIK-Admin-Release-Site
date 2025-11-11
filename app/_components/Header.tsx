@@ -27,7 +27,9 @@ export const Header = () => {
                             className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800" 
                             aria-label="Toggle dark mode"
                         >
-                            {theme === 'dark' ? <SunIcon className="w-6 h-6 text-slate-300" /> : <MoonIcon className="w-6 h-6 text-slate-600" />}
+                            {/* Render both icons to avoid hydration mismatch; CSS controls visibility */}
+                            <SunIcon className="w-6 h-6 text-slate-300 hidden dark:block" aria-hidden="true" />
+                            <MoonIcon className="w-6 h-6 text-slate-600 block dark:hidden" aria-hidden="true" />
                         </button>
                     </div>
                 </div>
